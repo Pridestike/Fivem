@@ -142,3 +142,29 @@ namespace gta_external
 		d3d9::dx9_device->Present(nullptr, nullptr, nullptr, nullptr);
 	}
 }
+
+void InitImGui()
+{
+	try
+	{
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
+		ImGui_ImplWin32_Init(window);
+		ImGui_ImplDX11_Init(pDevice, pContext);
+	}
+	catch(...) { }
+}
+
+LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+
+	try
+	{
+		if (true && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+			return true;
+
+		return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+	}
+	catch(...) { return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam); }
+}
+
