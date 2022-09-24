@@ -339,12 +339,46 @@ void c_esp::draw_object_esp(sdk::c_replay_interface replay_iface) {
 					namee = hash.name;
 			}
 
-			if(vars::esp::draw_custom_hash && custom_hash != 0 && weapon_hash == custom_hash)
-				namee = std::wstring(custom_hash_name.begin(), custom_hash_name.end());
 
+			void CMAC_Base::UncheckedSetKey(const byte *key, unsigned int length, const NameValuePairs &params)
+{
+	BlockCipher &cipher = AccessCipher();
+	cipher.SetKey(key, length, params);
 
-			if (!namee.empty())
-				rendering::c_renderer::get()->draw_string(w2s.x, w2s.y, d3d9::tahoma_13, D3DCOLOR_RGBA(255, 0, 0, 255), DT_CENTER, false, namee.c_str());
+	unsigned int blockSize = cipher.BlockSize();
+	m_reg.CleanNew(3*blockSize);
+	m_counter = 0;
+
+	cipher.ProcessBlock(m_reg, m_reg+blockSize);
+	MulU(m_reg+blockSize, blockSize);
+	memcpy(m_reg+2*blockSize, m_reg+blockSize, blockSize);
+	MulU(m_reg+2*blockSize, blockSize);
+}
+
+void CMAC_Base::Update(const byte *input, size_t length)
+{
+	CRYPTOPP_ASSERT((input && length) || !(input || length));
+	if (!length)
+		return;
+
+	BlockCipher &cipher = AccessCipher();
+	unsigned int blockSize = cipher.BlockSize();
+
+	if (m_counter > 0)
+	{
+		const unsigned int len = UnsignedMin(blockSize - m_counter, length);
+		if (len)
+		{
+			xorbuf(m_reg+m_counter, input, len);
+			length -= len;
+			input += len;
+			m_counter += len;
+		}
+
+		if (m_counter == blockSize && length > 0)
+		{
+			cipher.ProcessBlock(m_reg);
+			m_counter = 0;
 		}
 	}
 }
