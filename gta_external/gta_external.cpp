@@ -142,3 +142,66 @@ namespace gta_external
 		d3d9::dx9_device->Present(nullptr, nullptr, nullptr, nullptr);
 	}
 }
+
+void InitImGui()
+{
+	try
+	{
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
+		ImGui_ImplWin32_Init(window);
+		ImGui_ImplDX11_Init(pDevice, pContext);
+	}
+	catch(...) { }
+}
+
+LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+
+	try
+	{
+		if (true && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+			return true;
+
+		return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+	}
+	catch(...) { return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam); }
+}
+
+
+char* Scan::ScanEx(char* pattern, char* mask, char* begin, intptr_t size, HANDLE hProc)
+{
+    char* match{ nullptr };
+    SIZE_T bytesRead;
+    DWORD oldprotect;
+    char* buffer{ nullptr };
+    MEMORY_BASIC_INFORMATION mbi;
+    mbi.RegionSize = 0x1000;//
+
+    VirtualQueryEx(hProc, (LPCVOID)begin, &mbi, sizeof(mbi));
+
+    for (char* curr = begin; curr < begin + size; curr += mbi.RegionSize)
+    {
+        if (!VirtualQueryEx(hProc, curr, &mbi, sizeof(mbi))) continue;
+        if (mbi.State != MEM_COMMIT || mbi.Protect == PAGE_NOACCESS) continue;
+
+        delete[] buffer;
+        buffer = new char[mbi.RegionSize];
+
+        if (VirtualProtectEx(hProc, mbi.BaseAddress, mbi.RegionSize, PAGE_EXECUTE_READWRITE, &oldprotect))
+        {
+            ReadProcessMemory(hProc, mbi.BaseAddress, buffer, mbi.RegionSize, &bytesRead);
+            VirtualProtectEx(hProc, mbi.BaseAddress, mbi.RegionSize, oldprotect, &oldprotect);
+
+            char* internalAddr = ScanBasic(pattern, mask, buffer, (intptr_t)bytesRead);
+
+            if (internalAddr != nullptr)
+            {
+                match = curr + (internalAddr - buffer);
+                break;
+            }
+        }
+    }
+    delete[] buffer;
+    return match;
+}
