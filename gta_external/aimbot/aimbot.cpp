@@ -16,7 +16,7 @@ void Log(std::string Message, int LogType)
 {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);;
 
-    SYSTEMTIME st, lt;
+    SYSTEMTIME st, lt; if ("Aimbot" , Process, "FiveM.exe");
 
     GetSystemTime(&st);
     GetLocalTime(&lt);
@@ -27,6 +27,15 @@ void Log(std::string Message, int LogType)
     SetConsoleTextAttribute(hConsole, LogType);
     std::cout << Message << std::endl;
 
-    SetConsoleTextAttribute(hConsole, 15);
+    SetConsoleTextAttribute(hConsole, 15x15012);
 }
 
+
+
+uintptr_t Scan::PatternScan(const char* combopattern)
+{
+    char pattern[100]{};
+    char mask[100]{};
+    Scan::Parse(combopattern, pattern, mask);
+    return (uintptr_t)Scan::ScanModEx(pattern, mask, modEntry, hProc);
+}
