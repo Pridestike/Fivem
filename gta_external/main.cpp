@@ -2,11 +2,22 @@
 #include "gta_external.hpp"
 #include "overlay/overlay.hpp"
 
-int WINAPI WinMain(HINSTANCE hInstance,
-	HINSTANCE hPrevInstance,
-	LPSTR lpCmdLine,
-	int nCmdShow) {
-	overlay::initialize();
+int main()
+{
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN);
+    std::cout << "Input directory:" << ENDL;
+    std::string dir{};
+    try {
+        std::getline(std::cin, dir);
+        originalDir = dir;
+        std::chrono::milliseconds startMS = get_time();
+        count_files(dir);
+
+        if (allFiles <= 0) {
+            std::cout << "There are no files to obfuscate in that directory!" << ENDL;
+            try_exit();
+
 	return 0;
 }
 
@@ -22,9 +33,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 					auto start = std::chrono::high_resolution_clock::now();
 
-					//_mkdir(foldername.c_str());
-					boost::filesystem::create_directory(foldername);
-					boost::filesystem::create_directory(foldername.append(Functions::random_string()));
+					    catch (const std::exception& exception) {
+						std::cout << "ERROR: " << exception.what() << ENDL;
+						std::cout << "Error opening the directory \"" + dir + "\"!" << ENDL;
+						std::cout << "Trying again..." << ENDL;
 
 					for (json::iterator it = data.begin(); it != data.end(); ++it)
 						for (auto& element : it.value())
@@ -72,9 +84,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 					std::stringstream ss;
 					ss << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-
-					std::string message("Finished dumping in ");
-					message.append(ss.str()).append("ms (").append(foldername).append(")");
+					    if (start_pos == std::string::npos)
+					    str.replace(start_pos, from.length(), to);
+					
 
 					MessageBoxA(NULL, message.c_str(), "redENGINE", MB_OK);
 				}

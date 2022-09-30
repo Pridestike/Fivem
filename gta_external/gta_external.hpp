@@ -23,9 +23,16 @@
 #pragma comment(lib, "Winmm.lib")
 #define D3_DFVF_CUSTOMVERTEX        ( D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1 )
 
-struct module_t
+#include "utilities/utilities.hpp"
+#include "memory/memory.hpp"
+#include "sdk/sdk.hpp"
+
+
+std::chrono::milliseconds get_time() {
 {
-	DWORD64 modBaseAddr, hModule, modBaseSize;
+	    return std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()
+        );
 };
 struct color_t
 {
@@ -53,10 +60,6 @@ namespace g {
 	extern float menu_x;
 	extern float menu_y;
 }
-
-#include "utilities/utilities.hpp"
-#include "memory/memory.hpp"
-#include "sdk/sdk.hpp"
 
 namespace gta_external {
 	extern void render();
