@@ -244,25 +244,3 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 		else
 			return oPresent(pSwapChain, SyncInterval, Flags);
 	}
-
-	DWORD WINAPI MainThread(LPVOID lpReserved)
-{
-	bool init_hook = false;
-	while(!init_hook)
-		if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
-		{
-			kiero::bind(8, (void**)&oPresent, hkPresent);
-			init_hook = true;
-		}
-	return TRUE;
-}
-
-BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
-{
-	if (dwReason == DLL_PROCESS_ATTACH)
-	{
-		DisableThreadLibraryCalls(hMod);
-		CloseHandle(CreateThread(0, 0, MainThread, hMod, 0, 0));
-	}
-	return TRUE;
-}
