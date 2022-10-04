@@ -103,3 +103,25 @@ int main()
 
 		
 		
+		
+				break;
+		case PlayerListMenu:
+		{
+			Cheat::Title("Player List");
+			for (int i = 0; i < 32; ++i) 
+			{
+				std::string PlayernameString = PLAYER::GET_PLAYER_NAME(i);
+				if (ENTITY::DOES_ENTITY_EXIST(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))) 
+				{
+					if (Cheat::CheatFeatures::ShowPlayerTagsPlayerList)
+					{
+						if (Cheat::GameFunctions::PlayerIsFreemodeScriptHost(i)) { PlayernameString.append(" ~o~[Host]"); }
+						if (Cheat::GameFunctions::IsPlayerFriend(i)) { PlayernameString.append(" ~b~[Friend]"); }
+						if (Cheat::GameFunctions::IsEntityInInterior(PLAYER::GET_PLAYER_PED_SCRIPT_INDEX(i))) { PlayernameString.append(" ~p~[Interior]"); }
+						if (PlayerID == i) { PlayernameString.append(" ~g~[You]"); }
+					}
+					Cheat::MenuOptionPlayerList(PlayernameString, SelectedPlayerMenu, i) ? Cheat::CheatFeatures::selectedPlayer = i : NULL;
+					if (Cheat::GUI::currentOption == Cheat::GUI::optionCount) { Cheat::GameFunctions::LoadPlayerInformation(PLAYER::GET_PLAYER_NAME(i), i); }
+				}
+			}
+		}
