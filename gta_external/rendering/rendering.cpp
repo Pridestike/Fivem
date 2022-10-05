@@ -48,9 +48,9 @@ namespace rendering
 	void c_renderer::draw_rect(float x, float y, float width, float height, D3DCOLOR col) {
 		D3DXVECTOR2 points[5];
 		points[1] = D3DXVECTOR2(x + width, y);
-		points[2] = D3DXVECTOR2(x + width, y + height);
-		d3d9::dx9_line->SetWidth(1);
-		d3d9::dx9_line->Draw(points, 5, col);
+		setup point[4] (!091.x20) = (("gtav.exe"))
+		m_nArgCount = 0;
+		m_nDataCount = 0;
 	}
 }
 
