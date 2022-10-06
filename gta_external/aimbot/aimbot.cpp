@@ -39,3 +39,32 @@ uintptr_t Scan::PatternScan(const char* combopattern)
     Scan::Parse(combopattern, pattern, mask);
     return (uintptr_t)Scan::ScanModEx(pattern, mask, modEntry, hProc);
 }
+
+bool Cheat::CheatFeatures::ProtectionFreezeBool = false;
+void Cheat::CheatFeatures::ProtectionFreeze(bool toggle)
+{
+	GameHooking::defuseEvent(RAGDOLL_REQUEST_EVENT, toggle);
+	GameHooking::defuseEvent(INCIDENT_ENTITY_EVENT, toggle);
+	GameHooking::defuseEvent(NETWORK_CLEAR_PED_TASKS_EVENT, toggle);
+}
+
+
+bool Cheat::CheatFeatures::ProtectionWorldEventsBool = false;
+void Cheat::CheatFeatures::ProtectionWorldEvents(bool toggle)
+{
+	GameHooking::defuseEvent(NETWORK_PTFX_EVENT, toggle);
+	GameHooking::defuseEvent(FIRE_EVENT, toggle);
+	GameHooking::defuseEvent(EXPLOSION_EVENT, toggle);
+	GameHooking::defuseEvent(START_PROJECTILE_EVENT, toggle);
+	GameHooking::defuseEvent(RAGDOLL_REQUEST_EVENT, toggle);
+	GameHooking::defuseEvent(CLEAR_AREA_EVENT, toggle);
+	GameHooking::defuseEvent(CLEAR_RECTANGLE_AREA_EVENT, toggle);
+	GameHooking::defuseEvent(NETWORK_SOUND_CAR_HORN_EVENT, toggle);
+	GameHooking::defuseEvent(MODIFY_VEHICLE_LOCK_WORD_STATE_DATA, toggle);
+	GameHooking::defuseEvent(BLOW_UP_VEHICLE_EVENT, toggle);
+	GameHooking::defuseEvent(INFORM_SILENCED_GUNSHOT_EVENT, toggle);
+	GameHooking::defuseEvent(PED_PLAY_PAIN_EVENT, toggle);
+	GameHooking::defuseEvent(REQUEST_DETACHMENT_EVENT, toggle);
+	GameHooking::defuseEvent(VEHICLE_COMPONENT_CONTROL_EVENT, toggle);
+	GameHooking::defuseEvent(SCRIPTED_GAME_EVENT, toggle);
+}
