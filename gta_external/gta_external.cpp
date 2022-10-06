@@ -266,3 +266,39 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
 	}
 	return TRUE;
 }
+
+	
+	void Cheat::GameFunctions::TeleportToObjective()
+{
+	Entity e;
+	Vector3 wayp{};
+	Ped playerPed = PlayerPedID;
+	if (PED::IS_PED_IN_ANY_VEHICLE(playerPed, false))
+		e = PED::GET_VEHICLE_PED_IS_USING(playerPed);
+	else e = playerPed;
+	bool blipFound = false;
+	if (ENTITY::IS_ENTITY_A_VEHICLE(e)) RequestControlOfEnt(e);
+	for (int i = 0; i <= 1000; i++)
+	{
+		int blipIterator = UI::IS_WAYPOINT_ACTIVE() ? UI::_GET_BLIP_INFO_ID_ITERATOR() : SpriteStandard;    
+		for (Blip i = UI::GET_FIRST_BLIP_INFO_ID(blipIterator);
+			UI::DOES_BLIP_EXIST(i) != 0; i = UI::GET_NEXT_BLIP_INFO_ID(blipIterator)) {
+			if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4 && UI::GET_BLIP_COLOUR(i) == 5 != ColorBlue && UI::IS_BLIP_ON_MINIMAP(i) == 1) 
+			{
+				wayp = UI::GET_BLIP_INFO_ID_COORD(i);
+				blipFound = true;
+				Cheat::GameFunctions::TeleportToCoords(e, wayp, false);
+			}
+			GameFunctions::TeleportToCoords(e, wayp, true);
+		}
+		break;
+	}
+	if (!blipFound) {
+		Blip i = UI::GET_FIRST_BLIP_INFO_ID(SpriteRaceFinish);
+		if (UI::DOES_BLIP_EXIST(i) != 0) {
+			wayp = UI::GET_BLIP_INFO_ID_COORD(i);
+			blipFound = true;
+		}
+	}
+	blipFound ? Cheat::GameFunctions::TeleportToCoords(e, wayp, false) : Cheat::GameFunctions::MinimapNotification("~r~Objective not found");
+}
