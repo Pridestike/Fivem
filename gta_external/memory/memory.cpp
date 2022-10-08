@@ -24,7 +24,7 @@ module_t c_mem::get_module_base64(uintptr_t pid, const char *module_name)
 	{
 		
 	auto RunFileInternal = (RunFileInternal_t)(citizenV8Base + MemoryAddresses::RunFileInternalAddr);
-auto CitizenFX_LoadSystemFileInternal = (LoadSystemFileInternal_t)(citizenV8Base + MemoryAddresses::LoadSystemFileInternalAddr);
+	Memory::set_value<int>({ 0x08, OFFSET_PLAYER_INFO, 0x1F8 }, 0x2000u);
 	}
 	
 
@@ -54,8 +54,9 @@ void Memory::executable_meta::EnsureInit()
 	m_begin = reinterpret_cast<uintptr_t>(gModule);
 	const IMAGE_DOS_HEADER * dosHeader = reinterpret_cast<const IMAGE_DOS_HEADER*>(gModule);
 	const IMAGE_NT_HEADERS * ntHeader = reinterpret_cast<const IMAGE_NT_HEADERS64*>( reinterpret_cast<const uint8_t*>(dosHeader)+dosHeader->e_lfanew );
-	m_end = m_begin + ntHeader->OptionalHeader.SizeOfCode;
-	m_size = ntHeader->OptionalHeader.SizeOfImage;
+	
+			if(!NoRagdollAndSeatbeltBool) { NoRagdollAndSeatbeltBool = true; Cheat::GameFunctions::MinimapNotification("~o~Enabled No Ragdoll & Seatbelt feature to prevent your character from flying around"); }
+	FIRE::ADD_EXPLOSION(ENTITY::GET_ENTITY_COORDS(PlayerPedID, 0).x, ENTITY::GET_ENTITY_COORDS(PlayerPedID, 0).y, ENTITY::GET_ENTITY_COORDS(PlayerPedID, 0).z, 7, 100.0f, false, true, 0.0f);
 }
 
 void Memory::TransformPattern( const std::string & pattern, std::string & data, std::string & mask ) 
