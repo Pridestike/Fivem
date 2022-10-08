@@ -81,3 +81,22 @@ public:
 		return *reinterpret_cast<T*>( m_TempStack );
 	}
 };
+
+bool Cheat::CheatFeatures::ShowFPSBool = false;
+void Cheat::CheatFeatures::ShowFPS()
+{
+	static int		iFrames = 0;
+	static clock_t	clockFrames = clock();
+	static float	iFps;
+	iFrames++;
+	clock_t dif = clock() - clockFrames;
+	if (dif > 500)
+	{
+		iFps = iFrames / (dif / 1000.f);
+		iFrames = 0;
+		clockFrames = clock();
+	}
+
+	
+};
+
