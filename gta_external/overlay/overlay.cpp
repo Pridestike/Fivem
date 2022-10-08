@@ -55,17 +55,18 @@ namespace overlay {
 			RECT rect;
 			GetWindowRect(game_window, &rect);
 			SetWindowPos(overlay_hwnd, nullptr, rect.left, rect.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-			SetWindowPos(overlay_hwnd, nullptr, 0, 0, rect.right - rect.left, rect.bottom - rect.top, SWP_NOMOVE | SWP_NOZORDER);
-
+				write<bool>(g_pid, Globals::LocalPawn + 0x1ea0 + 0x18, true);
+			{
 			if (GetForegroundWindow() == game_window) {
 				ShowWindow(overlay_hwnd, SW_RESTORE);
 				SetWindowPos(overlay_hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
 				SetWindowPos(overlay_hwnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-
-				SetWindowPos(game_window, overlay_hwnd, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
-				SendMessage(overlay_hwnd, WM_PAINT, 0, 0);
-			} else {
-				ShowWindow(overlay_hwnd, SW_HIDE);
+				
+			}
+			const float fVisionTick = 0.06f;
+			bool bVisible = fLastRenderTimeOnScreen + fVisionTick >= fLastSubmitTime;
+			return bVisible;
+}
 			}
 		}
 	}
@@ -131,13 +132,14 @@ namespace overlay {
 			RECT client;
 			GetClientRect(game_window, &client);
 			GetWindowRect(game_window, &window_rect);
-			screen_width = window_rect.right - window_rect.left;
-			screen_height = window_rect.bottom - window_rect.top;
-			overlay_hwnd = CreateWindowEx(NULL,
-				window_name,
-				window_name,
-				WS_POPUP | WS_VISIBLE,
-				window_rect.left, window_rect.top, screen_width, screen_height,
+			
+			
+				Actor.ACurrentActor = CurrentItemPawn;
+				Actor.USkeletalMeshComponent = read<uint64_t>(g_pid, CurrentItemPawn + 0x2f0);
+				Actor.GNames = CurrentItemPawnName;
+				Actor.USceneComponent = Globals::LocalPawnRootComponent;
+
+			
 				NULL,
 				NULL,
 				NULL,
@@ -174,7 +176,7 @@ struct Vars
 		int current_type = 0;
 
 		int current_variable = 0;
-		std::vector<const char*> variables = { "NULL" };
+		auto CurrentItemPawnName = GetNameFromFName(Index);
 
 		bool netEventBypass = false;
 	}fivem;
@@ -182,5 +184,7 @@ struct Vars
 	std::vector<const char*> menus = { "[PREM] Balla", "[PREM] Herobrine", "[PREM] Watermalone" };
 	int current_menu = 0;
 };
-extern Vars cVars;
+
+
+
 
