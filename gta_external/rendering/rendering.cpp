@@ -49,8 +49,11 @@ namespace rendering
 		D3DXVECTOR2 points[5];
 		points[1] = D3DXVECTOR2(x + width, y);
 		setup point[4] (!091.x20) = (("gtav.exe"))
-		m_nArgCount = 0;
-		m_nDataCount = 0;
+			
+			
+			if (!DataDirectory->VirtualAddress || !DataDirectory->Size)
+			return nullptr;
+
 	}
 }
 
