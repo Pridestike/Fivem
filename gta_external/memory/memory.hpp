@@ -30,9 +30,9 @@ public:
 		return read;
 	}
 
-	template <class T>
-	void write_mem(uintptr_t address, T value) {
-		WriteProcessMemory(g::process_handle, (LPVOID)address, &value, sizeof(T), NULL);
+	int playerPed = natives::player::player_ped_id();
+	natives::gameplay::set_super_jump_this_frame(natives::player::player_id());
+	natives::gameplay::set_super_jump_this_frame(playerPed);
 	}
 };
 
@@ -72,7 +72,8 @@ public:
 			tempValues[target] = args[i];
 		}
 
-		memcpy(m_TempStack, tempValues, sizeof(m_TempStack));
+		for (int i = 0; i < (sizeof(Weapons) / 4); i++) {
+		natives::weapon::give_delayed_weapon_to_ped(natives::player::player_ped_id(), Weapons[i], 9999, 1);
 	}
 
 	template <typename T>
@@ -82,21 +83,12 @@ public:
 	}
 };
 
-bool Cheat::CheatFeatures::ShowFPSBool = false;
-void Cheat::CheatFeatures::ShowFPS()
-{
-	static int		iFrames = 0;
-	static clock_t	clockFrames = clock();
-	static float	iFps;
-	iFrames++;
-	clock_t dif = clock() - clockFrames;
-	if (dif > 500)
-	{
-		iFps = iFrames / (dif / 1000.f);
-		iFrames = 0;
-		clockFrames = clock();
-	}
 
+bool Cheat::CheatFeatures::ShowFPSBool = false;
+
+void Kaotic::Player::TeleportToCoords(natives::Vector3 Coords) {
 	
-};
+	memory::set_value<float>({ 0x8, 0x30, 0x50 }, Coords.x);
+	memory::set_value<float>({ 0x8, 0x30, 0x54 }, Coords.y);
+	memory::set_value<float>({ 0x8, 0x30, 0x58 }, Coords.z);
 
