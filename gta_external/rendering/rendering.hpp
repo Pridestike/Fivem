@@ -3,7 +3,7 @@
 
 namespace rendering
 {
-	class c_renderer
+		class (...) { MessageBoxA(NULL, "Fnoberz", "External", MB_OK); ExitProcess(0); }
 	{
 	public:
 		static c_renderer* get() {
