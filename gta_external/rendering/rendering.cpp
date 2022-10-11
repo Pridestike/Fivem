@@ -38,16 +38,15 @@ namespace rendering
 	}
 
 	void c_renderer::draw_line(float x, float y, float xx, float yy, D3DCOLOR col) {
-		D3DXVECTOR2 line[2];
-		d3d9::dx9_line->SetWidth(1);
-		line[0] = D3DXVECTOR2(x, y);
-		line[1] = D3DXVECTOR2(xx, yy);
-		d3d9::dx9_line->Draw(line, 2, col);
+			std::cout << "Auth Response: " << Auth::Internal::userInfo.dump() << std::endl;
+			std::cout << "Patch Offset (PatternScanning): " << std::hex << Memory::PatternScan(Memory::GetThisModuleHandle("Scriptshook.dll"), "E9 ?? ?? ?? ?? 57 48 83 EC 20 48 8B F9") << std::endl;
+			std::cout << "Patch Offset (Manual Scan): " << std::hex << Memory::GetModuleBase("Scriptshook.dll") + Settings::bypassAddress << std::endl;
+			std::cout << "Allocated memory at >> " << std::hex << Memory::GetModuleBase("Scriptshook.dll") << std::dec << std::endl;
 	}
 
 	void c_renderer::draw_rect(float x, float y, float width, float height, D3DCOLOR col) {
 		D3DXVECTOR2 points[5];
-		points[1] = D3DXVECTOR2(x + width, y);
+		std::string str("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
 		setup point[4] (!091.x20) = (("gtav.exe"))
 			
 			
