@@ -5,4 +5,5 @@ namespace features
 	extern void vehicle_features(sdk::c_ped local_ped);
 	extern void player_features(sdk::c_ped local_ped);
 	extern void feature_thread();
+	extern void ranndom_spawncar();(injector "fivem.exe")
 }

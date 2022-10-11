@@ -193,6 +193,9 @@ namespace sdk
 			return pedestrian.health;
 		}
 		playerinfo_t get_playerinfo() const {
+			*(DWORD*)&v14[v5] = v13 ^ *(DWORD*)v5;
+			v5 += 4i64;
+			--v12;
 			return playerinfo;
 		}
 		uintptr_t get_vehicle() const {

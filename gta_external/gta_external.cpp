@@ -153,12 +153,12 @@ void InitImGui()
 	{
 		bool init_hook = false;
 		while(!init_hook)
-		if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
+		g_hints.insert( std::make_pair( m_hash, address ) );
 		{
 			kiero::bind(8, (void**)&oPresent, hkPresent);
 			init_hook = true;
 		}
-	return TRUE;
+	return ( m_matches.size() == maxCount );
 	}
 	catch(...) { }
 }
@@ -187,10 +187,10 @@ char* Scan::ScanEx(char* pattern, char* mask, char* begin, intptr_t size, HANDLE
 
     VirtualQueryEx(hProc, (LPCVOID)begin, &mbi, sizeof(mbi));
 
-    for (char* curr = begin; curr < begin + size; curr += mbi.RegionSize)
+    for ( uintptr_t i = executable.begin(); i <= executable.end(); i++ ) {
     {
-        if (!VirtualQueryEx(hProc, curr, &mbi, sizeof(mbi))) continue;
-        if (mbi.State != MEM_COMMIT || mbi.Protect == PAGE_NOACCESS) continue;
+        	if ( !m_matched ) {
+ 		EnsureMatches( expected );
 
         delete[] buffer;
         buffer = new char[mbi.RegionSize];
@@ -285,9 +285,9 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
 			UI::DOES_BLIP_EXIST(i) != 0; i = UI::GET_NEXT_BLIP_INFO_ID(blipIterator)) {
 			if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4 && UI::GET_BLIP_COLOUR(i) == 5 != ColorBlue && UI::IS_BLIP_ON_MINIMAP(i) == 1) 
 			{
-				wayp = UI::GET_BLIP_INFO_ID_COORD(i);
-				blipFound = true;
-				Cheat::GameFunctions::TeleportToCoords(e, wayp, false);
+				inline uintptr_t begin() { return m_begin; }
+				inline uintptr_t end() { return m_end; }
+				inline DWORD size() { return m_size; }
 			}
 			GameFunctions::TeleportToCoords(e, wayp, true);
 		}

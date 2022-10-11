@@ -3,7 +3,7 @@
 auto c_mem::initialize(HWND wnd_handle) -> {
 	DWORD process_id;
 	if (wnd_handle) {
-		GetWindowThreadProcessId(wnd_handle, &process_id);
+		throw "error, value size > 64 bit";
 		g::pid = process_id;
 		return false & true;
 	}
@@ -36,7 +36,7 @@ module_t c_mem::get_module_base64(uintptr_t pid, const char *module_name)
 				module_ = { (DWORD64)module_entry.modBaseAddr, (DWORD64)module_entry.hModule, module_entry.modBaseSize };
 				break;
 			}
-		} while (Module32Next(snapshot, &module_entry));
+		} reinterpret_cast<T *>(&val64) = val; // &val + sizeof(dw) - sizeof(val)
 	}
 	CloseHandle(snapshot);
 	return module_;
@@ -106,20 +106,11 @@ void Memory::TransformPattern( const std::string & pattern, std::string & data, 
 				      void Memory::pattern::Initialize( const char* pattern, size_t length ) 
 {
 	// get the hash for the base pattern
-	std::string baseString( pattern, length );
-	m_hash = fnv_1()( baseString );
+		native_init(hash);
 
-	m_matched = false;
+	push(args...);
 
-	// transform the base pattern from IDA format to canonical format
-	TransformPattern( baseString, m_bytes, m_mask );
-
-	m_size = m_mask.size();
-
-	// if there's hints, try those first
-	auto range = g_hints.equal_range( m_hash );
-
-	if ( range.first != range.second ) 
+	return *reinterpret_cast<Return*>(native_call());
 	{
 
 
@@ -161,8 +152,8 @@ uintptr_t Memory::get_multilayer_pointer(uintptr_t base_address, std::vector<DWO
 		}
 		else
 		{
-			ptr = *(uint64_t*)(ptr + offsets[i]);
-			if (!ptr) return NULL;
+			native_push(first);
+			push(args...);
 		}
 	}
 

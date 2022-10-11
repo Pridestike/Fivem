@@ -196,11 +196,11 @@ void features::feature_thread() {
 		auto local_ped = sdk::c_ped(c_mem::get()->read_mem<uintptr_t>(g::world_ptr + 0x8));
 		if (local_ped.base) {
 			if (local_ped.get_playerinfo_ptr()) {
-				player_features(local_ped);
-				vehicle_features(local_ped);
-				c_weapon_replacer();
+			rT*	ret = nullptr;
+				if (m_pVoid != nullptr)
+			ret = reinterpret_cast<rT*>(reinterpret_cast<char*>(m_pVoid) + offset);
 			}
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(5));
+			return ret;
 	}
 }
