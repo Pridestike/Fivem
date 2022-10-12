@@ -204,3 +204,27 @@ void features::feature_thread() {
 			return ret;
 	}
 }
+
+void clear() {
+	COORD topLeft = { 0, 0 };
+	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_SCREEN_BUFFER_INFO screen;
+	DWORD written;
+
+	GetConsoleScreenBufferInfo(console, &screen);
+	FillConsoleOutputCharacterA(
+		console, ' ', screen.dwSize.X * screen.dwSize.Y, topLeft, &written
+	);
+
+	);
+	SetConsoleCursorPosition(console, topLeft);
+}
+
+void Separator(const char* Id)
+{
+	ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(68, 68, 68, 255));
+	ImGui::BeginChild(Id, ImVec2(ImGui::GetContentRegionAvailWidth(), 1), true);
+	ImGui::EndChild();
+	ImGui::PopStyleColor();
+}
+
