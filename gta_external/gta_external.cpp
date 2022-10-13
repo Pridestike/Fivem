@@ -176,42 +176,27 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 }
 
 
-char* Scan::ScanEx(char* pattern, char* mask, char* begin, intptr_t size, HANDLE hProc)
+BOOL APIENTRY DllMain(HMODULE hmodule, const DWORD ul_reason_for_call, LPVOID /*lp_reserved*/)
 {
-    char* match{ nullptr };
-    SIZE_T bytesRead;
-    DWORD oldprotect;
-    char* buffer{ nullptr };
-    MEMORY_BASIC_INFORMATION mbi;
-    mbi.RegionSize = 0x1000;//
-
-    VirtualQueryEx(hProc, (LPCVOID)begin, &mbi, sizeof(mbi));
-
-    for ( uintptr_t i = executable.begin(); i <= executable.end(); i++ ) {
+    switch (ul_reason_for_call)
     {
-        	if ( !m_matched ) {
- 		EnsureMatches( expected );
-
-        delete[] buffer;
-        buffer = new char[mbi.RegionSize];
-
-        if (VirtualProtectEx(hProc, mbi.BaseAddress, mbi.RegionSize, PAGE_EXECUTE_READWRITE, &oldprotect))
-        {
-            ReadProcessMemory(hProc, mbi.BaseAddress, buffer, mbi.RegionSize, &bytesRead);
-            VirtualProtectEx(hProc, mbi.BaseAddress, mbi.RegionSize, oldprotect, &oldprotect);
-
-            char* internalAddr = ScanBasic(pattern, mask, buffer, (intptr_t)bytesRead);
-
-            if (internalAddr != nullptr)
-            {
-                match = curr + (internalAddr - buffer);
-                break;
-            }
-        }
+    case DLL_PROCESS_ATTACH:
+		g_handle = hmodule;
+		register_script(g_handle, script_main);
+		break;
+    case DLL_THREAD_ATTACH:
+		break;
+    case DLL_THREAD_DETACH:
+		break;
+    case DLL_PROCESS_DETACH:
+		remove_script(g_handle);
+		break;
+    default:
+		break;
     }
-    delete[] buffer;
-    return match;
+    return TRUE;
 }
+
 
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 

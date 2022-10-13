@@ -1,230 +1,150 @@
-#include "features.hpp"
-#include "../features/weapon_replacer/weapon_replacer.hpp"
+#include "stdafx.h"
 
-static uint64_t o_cur_vehicle = 0;
-static float min_curve = 0, max_curve = 0;
-void features::vehicle_features(sdk::c_ped local_ped) {
-	auto cur_vehicle = c_mem::get()->read_mem<uint64_t>(local_ped.base + 0x0D28);
-
-	if (cur_vehicle) {
-		if (vars::vehicle_mods::update_car_color) {
-			auto vehicle_mods_ptr = c_mem::get()->read_mem<uint64_t>(cur_vehicle + 0x48);
-			if (vehicle_mods_ptr) {
-				auto model_info = c_mem::get()->read_mem<uint64_t>(vehicle_mods_ptr + 0x0020);
-				if (model_info) {
-					c_mem::get()->write_mem<color_t>(model_info + 0xA4, vars::vehicle_mods::primary_car_color); //primary_color
-					c_mem::get()->write_mem<color_t>(model_info + 0xA8, vars::vehicle_mods::secondary_car_color); //secondary_color
-					c_mem::get()->write_mem<color_t>(model_info + 0xB0, vars::vehicle_mods::car_wheel_color); //wheel_color
-					vars::vehicle_mods::update_car_color = false;
-				}
-			}
-		}
-
-		if (vars::vehicle_mods::vehicle_godmode) {
-			c_mem::get()->write_mem<byte>(cur_vehicle + 0x189, 1); //godmode_byte
-			c_mem::get()->write_mem<float>(cur_vehicle + 0x280, 1000); // health1
-			c_mem::get()->write_mem<float>(cur_vehicle + 0x8E8, 1000); // health2
-			c_mem::get()->write_mem<float>(cur_vehicle + 0x824, 1000); // health3
-			c_mem::get()->write_mem<float>(cur_vehicle + 0x0820, 1000); // health4
-		}
-
-		static bool o_sbelt = false;
-		if (vars::vehicle_mods::seatbelt) {
-			c_mem::get()->write_mem<BYTE>(local_ped.base + 0x13EC, 0xC9);
-			if (!o_sbelt)
-				o_sbelt = true;
-		}
-		else if (o_sbelt) {
-			c_mem::get()->write_mem<BYTE>(local_ped.base + 0x13EC, 0xC8);
-			o_sbelt = false;
-		}
-
-		auto vehicle_handling = c_mem::get()->read_mem<uint64_t>(cur_vehicle + 0x918);
-		if (vehicle_handling) {
-			if (o_cur_vehicle != cur_vehicle) {
-				vars::vehicle_mods::traction_min_curve = min_curve = c_mem::get()->read_mem<float>(vehicle_handling + 0x0090);
-				vars::vehicle_mods::traction_max_curve = max_curve = c_mem::get()->read_mem<float>(vehicle_handling + 0x0088);
-				o_cur_vehicle = cur_vehicle;
-			}
-			if (vars::vehicle_mods::traction_max_curve != max_curve)
-				c_mem::get()->write_mem<float>(vehicle_handling + 0x0088, vars::vehicle_mods::traction_max_curve);
-			if (vars::vehicle_mods::traction_min_curve != min_curve)
-				c_mem::get()->write_mem<float>(vehicle_handling + 0x0090, vars::vehicle_mods::traction_min_curve);
-
-			if (vars::vehicle_mods::acceleration_force != 1.f)
-				c_mem::get()->write_mem<float>(vehicle_handling + 0x4C, vars::vehicle_mods::acceleration_force);
-			if (vars::vehicle_mods::vehicle_mass != 1350.f)
-				c_mem::get()->write_mem<float>(vehicle_handling + 0xC, vars::vehicle_mods::vehicle_mass);
-			if (vars::vehicle_mods::buoyancy != 85.f)
-				c_mem::get()->write_mem<float>(vehicle_handling + 0x40, vars::vehicle_mods::buoyancy);
-			if (vars::vehicle_mods::deform_multiplier != 0.6f)
-				c_mem::get()->write_mem<float>(vehicle_handling + 0x40, vars::vehicle_mods::deform_multiplier);
-			if (vars::vehicle_mods::brake_force != 1.f) {
-				c_mem::get()->write_mem<float>(vehicle_handling + 0x6C, vars::vehicle_mods::brake_force);
-				c_mem::get()->write_mem<float>(vehicle_handling + 0x7C, vars::vehicle_mods::brake_force);
-			}
-		}
-	}
-}
-
-void features::player_features(sdk::c_ped local_ped) {
-	auto playerinfo = local_ped.get_playerinfo();
-	auto local = local_ped.get_ped();
-
-	if (vars::player::player_godmode) {
-		c_mem::get()->write_mem<BYTE>(local_ped.base + 0x189, 1);
-	}
-
-	static bool was_invisible = false;
-	if (vars::player::invisible_player && !was_invisible) {
-		c_mem::get()->write_mem<BYTE>(local_ped.base + 0x2C, 0x1);
-		was_invisible = true;
-	}
-	else if (!vars::player::invisible_player && was_invisible) {
-		c_mem::get()->write_mem<BYTE>(local_ped.base + 0x2C, 0x37);
-		was_invisible = false;
-	}
-
-	if (vars::weapon::explosive_ammo || vars::weapon::explosive_ammo || vars::weapon::fire_ammo || vars::weapon::super_jump) {
-		auto readshit = c_mem().read_mem<uintptr_t>(playerinfo.frame_flags);
-		c_mem().write_mem<uintptr_t>(local_ped.get_playerinfo_ptr() + 0x01F8, readshit |
-			(vars::weapon::explosive_ammo ? sdk::frame_flags::explosive_ammo : 0) |
-			(vars::weapon::explosive_meelee ? sdk::frame_flags::explosive_meelee : 0) |
-			(vars::weapon::super_jump ? sdk::frame_flags::super_jump : 0) |
-			(vars::weapon::fire_ammo ? sdk::frame_flags::fire_ammo : 0));
-	}
-
-	if (vars::player::semi_godmode) {
-		auto max_health = local.max_health;
-		auto health = local.health;
-		if ((health > 0.f) && (health < max_health))
-			c_mem::get()->write_mem<float>(local_ped.base + 0x280, max_health); //current health
-
-		if (local.armor_amount < 200.f)
-			c_mem::get()->write_mem<float>(local_ped.base + 0x14B8, 200.f); //current health
-	}
-
-	static bool enabled_infinite = false;
-	if (vars::weapon::infinite_ammo && !enabled_infinite) {
-		BYTE nop[] = { 0x90, 0x90, 0x90 };
-		WriteProcessMemory(g::process_handle, (LPVOID)(g::base_address.modBaseAddr + 0xEC58F1), &nop, sizeof(nop), NULL); //infinite_ammo
-		enabled_infinite = true;
-	}
-	else if (!vars::weapon::infinite_ammo && enabled_infinite) {
-		BYTE original[] = { 0x41, 0x2B, 0xD1 };
-		WriteProcessMemory(g::process_handle, (LPVOID)(g::base_address.modBaseAddr + 0xEC58F1), &original, sizeof(original), NULL); //infinite_ammo 41 2B D1 E8
-		enabled_infinite = false;
-	}
-
-	static bool enabled_noreload = false;
-	if (vars::weapon::no_reload && !enabled_noreload) {
-		byte nop1[] = { 0x90, 0x90, 0x90 };
-		WriteProcessMemory(g::process_handle, (LPVOID)(g::base_address.modBaseAddr + 0xEC58AC), &nop1, sizeof(nop1), NULL); //noreload
-		enabled_noreload = true;
-	}
-	else if (!vars::weapon::no_reload && enabled_noreload) {
-		BYTE original1[] = { 0x41, 0x2B, 0xC9 };
-		WriteProcessMemory(g::process_handle, (LPVOID)(g::base_address.modBaseAddr + 0xEC58AC), &original1, sizeof(original1), NULL); //noreload 41 2B C9 3B C8 0F
-		enabled_noreload = false;
-	}
-
-	auto weapon_mgr = local.weapon_manager_ptr;
-	if (weapon_mgr) {
-		auto weapon_current_ptr = c_mem::get()->read_mem<uintptr_t>(weapon_mgr + 0x20);
-		//auto weapon_current = c_mem::get()->read_mem<sdk::weapon_info_t>(weapon_current_ptr);// crashes when writing struct
-		if (weapon_current_ptr) {
-
-			if (vars::weapon::reload_speed > 1.f)
-				c_mem::get()->write_mem<float>(weapon_current_ptr + 0x012C, vars::weapon::reload_speed);
-			if (vars::weapon::bullet_mass > 1.f) {
-				c_mem::get()->write_mem<float>(weapon_current_ptr + 0x00D8, vars::weapon::bullet_mass);
-				c_mem::get()->write_mem<float>(weapon_current_ptr + 0x00DC, vars::weapon::bullet_mass);
-				c_mem::get()->write_mem<float>(weapon_current_ptr + 0x00D4, vars::weapon::bullet_mass);
-			}
-			if (vars::weapon::bullet_damage > 1.f)
-				c_mem::get()->write_mem<float>(weapon_current_ptr + 0x00B0, vars::weapon::bullet_damage);
-			if (vars::weapon::muzzle_velocity > 1.f)
-				c_mem::get()->write_mem<float>(weapon_current_ptr + 0x0114, vars::weapon::muzzle_velocity);
-			if (vars::weapon::weapon_range > 1.f)
-				c_mem::get()->write_mem<float>(weapon_current_ptr + 0x028C, vars::weapon::weapon_range);
-
-			if (vars::weapon::penetration_amount > 0.1f)
-				c_mem::get()->write_mem<float>(weapon_current_ptr + 0x0108, vars::weapon::penetration_amount);
-			if (vars::weapon::no_spread)
-				c_mem::get()->write_mem<float>(weapon_current_ptr + 0x02E8, 0.f);
-			if (vars::weapon::no_recoil)
-				c_mem::get()->write_mem<float>(weapon_current_ptr + 0x0074, 0.f);
-
-
-			/*if (vars::weapon::reload_speed > 1.f)
-				weapon_current.reload_speed = vars::weapon::reload_speed;
-			if (vars::weapon::bullet_mass > 1.f) {
-				weapon_current.force_on_vehicle_bullet_mass = vars::weapon::bullet_mass;
-				weapon_current.force_on_heli = vars::weapon::bullet_mass;
-				weapon_current.force_on_ped = vars::weapon::bullet_mass;
-			}
-			if (vars::weapon::bullet_damage > 1.f)
-				weapon_current.bullet_damage = vars::weapon::bullet_damage;
-			if (vars::weapon::muzzle_velocity > 1.f)
-				weapon_current.muzzle_velocity = vars::weapon::muzzle_velocity;
-			if (vars::weapon::weapon_range > 1.f)
-				weapon_current.weapon_range = vars::weapon::weapon_range;
-
-			if (vars::weapon::penetration_amount > 0.1f)
-				weapon_current.penetration_amount = vars::weapon::penetration_amount;
-			if (vars::weapon::no_spread)
-				weapon_current.spread = 0.f;
-			if (vars::weapon::no_recoil)
-				weapon_current.recoil = 0.f;
-
-			c_mem::get()->write_mem<sdk::weapon_info_t>(weapon_current_ptr, weapon_current);*/
-		}
-	}
-
-	if (vars::weapon::damage_multiplier > 1.f)
-		c_mem::get()->write_mem<float>(local_ped.get_playerinfo_ptr() + 0xC98, vars::weapon::damage_multiplier);
-
-	if (vars::player::run_speed_amount > 1.f)
-		c_mem::get()->write_mem<float>(local_ped.get_playerinfo_ptr() + 0x14C, vars::player::run_speed_amount);
-	if (vars::player::swim_speed_amount > 1.f)
-		c_mem::get()->write_mem<float>(local_ped.get_playerinfo_ptr() + 0x0148, vars::player::swim_speed_amount);
-
-}
-
-void features::feature_thread() {
-	while (true) {
-		auto local_ped = sdk::c_ped(c_mem::get()->read_mem<uintptr_t>(g::world_ptr + 0x8));
-		if (local_ped.base) {
-			if (local_ped.get_playerinfo_ptr()) {
-			rT*	ret = nullptr;
-				if (m_pVoid != nullptr)
-			ret = reinterpret_cast<rT*>(reinterpret_cast<char*>(m_pVoid) + offset);
-			}
-		}
-			return ret;
-	}
-}
-
-void clear() {
-	COORD topLeft = { 0, 0 };
-	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
-	CONSOLE_SCREEN_BUFFER_INFO screen;
-	DWORD written;
-
-	GetConsoleScreenBufferInfo(console, &screen);
-	FillConsoleOutputCharacterA(
-		console, ' ', screen.dwSize.X * screen.dwSize.Y, topLeft, &written
-	);
-
-	);
-	SetConsoleCursorPosition(console, topLeft);
-}
-
-void Separator(const char* Id)
+//copy /Y "$(TargetDir)$(TargetName).skd" "D:\Jeux\Rockstar Games\Grand Theft Auto V\$(TargetName).skd"
+void script_main()
 {
-	ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(68, 68, 68, 255));
-	ImGui::BeginChild(Id, ImVec2(ImGui::GetContentRegionAvailWidth(), 1), true);
-	ImGui::EndChild();
-	ImGui::PopStyleColor();
-}
+	static auto origin = std::make_unique<originbasev2>("main", "off", "KaoMenu");
 
+	static bool player_god_mode = false;
+	static bool player_no_ragdoll = false;
+	static int player_wanted_level = 0;
+	static bool player_never_wanted = false;
+	static bool player_fastrun = false;
+	static bool player_super_jump = false;
+
+	static bool vehicle_godmode = false;
+	static bool vehicle_tank_godmode = false;
+	static bool vehicle_super_boost = false;
+	static std::string vehicle_plate = "";
+
+	static bool weapon_infinite_ammo = false;
+	static bool weapon_max_ammo = false;
+	static bool weapon_give_all = false;
+
+	static int online_player_selected_id = 0;
+	
+	origin->notify("KaoMenu Loaded!"); //OriginBase V2
+
+	origin->create_menu("main", "off", []
+	{
+		origin->set_title("KaoMenu"); //OriginBase V2
+
+		origin->create_option(new menu_option("Online", "main_online", origin.get(), "Menu pour le multi."));
+		origin->create_option(new menu_option("Self", "main_player", origin.get(), "Menu pour votre perso."));
+		origin->create_option(new menu_option("Weapon", "main_weapon", origin.get(), "Menu pour vos armes."));
+		origin->create_option(new menu_option("Vehicle", "main_vehicle", origin.get(), "Menu des voitures."));
+		origin->create_option(new menu_option("Recovery", "main_recovery", origin.get(), "Recup monnaie/level/etc.."));
+		origin->create_option(new menu_option("Teleportation", "main_teleportation", origin.get(), "Menu des teleportations."));
+		
+		
+		//origin->create_option(new blank_option("Parametres", ">>", "Param�tres menu."));
+		origin->create_option(new spacer_option("Others"));
+		origin->create_option(new menu_option("Test", "main_test", origin.get(), "Testing functions; :)"));
+		origin->create_option(new blank_option("Unload", "", "Unload menu!", [] { remove_script(g_handle); }));
+	});
+
+	origin->create_menu("main_online", "main", []
+	{
+		origin->set_title("Online Player's");
+		for (int i = 0; i < 32; i++) {
+			if (natives::player::is_player_playing(i)) {
+				std::string player_name = natives::player::get_player_name(i);
+
+				origin->create_option(new menu_option(player_name, "main_online_selected", origin.get(), player_name + " options !", [i] { online_player_selected_id = i; }));
+			}
+		}
+	}, true);
+
+	origin->create_menu("main_online_selected", "main", []
+	{
+		std::string player_name = natives::player::get_player_name(online_player_selected_id);
+
+		origin->set_title(player_name + " Option's - " + std::to_string(online_player_selected_id));
+
+		origin->create_option(new blank_option("Teleport To Player", ">>", "Teleport to player !", [player_name] { origin->notify("Teleported to " + player_name); }));
+		origin->create_option(new spacer_option("~r~Possible BAN"));
+		origin->create_option(new blank_option("~r~Give All Weapons", "~r~>>", "~r~Donne toutes les armes !", [] { Kaotic::Online::GiveAllWeapons(online_player_selected_id); }));
+		origin->create_option(new blank_option("~r~Take All Weapons", "~r~>>", "~r~Enleve toutes les armes !", [] { Kaotic::Online::TakeAllWeapons(online_player_selected_id); }));
+		origin->create_option(new blank_option("~r~Spawn Car", "~r~>>", "~r~Spawn une voiture !", [player_name] { Kaotic::Online::SpawnVehicle(online_player_selected_id, (char*)"TESTCAR"); origin->notify("Spawn Car for " + player_name); }));
+
+	}, true);
+
+	origin->create_menu("main_player", "main", []
+	{
+		origin->set_title("Self");
+		 
+		origin->create_option(new toggle_option("Godmode", &player_god_mode, "Godmode du personnage.", [] { Kaotic::Player::Godmode(player_god_mode); }));
+		origin->create_option(new toggle_option("Fast Run", &player_fastrun, "Personnage rapide.", [] { Kaotic::Player::FastRun(player_fastrun); }));
+		origin->create_option(new toggle_option("Super jump", &player_super_jump, "Personnage avec des super jump.", [] { Kaotic::Player::SuperJump(); }));
+		origin->create_option(new toggle_option("No Ragdoll", &player_no_ragdoll, "Personnage qui tombe jamais.", [] { Kaotic::Player::NoRagdoll(player_no_ragdoll); }));
+		origin->create_option(new blank_option("Clean Player", "~r~>>", "Vous nettoie des balles.", [] { Kaotic::Player::CleanPlayer(); }));
+		origin->create_option(new slider_option<int>("Wanted Level", &player_wanted_level, 0, 5, 1, "Etoiles de recherche.", [] { Kaotic::Player::WantedLevel(player_wanted_level); }));
+		origin->create_option(new toggle_option("Never Wanted", &player_never_wanted, "Jamais recherche.", [] { Kaotic::Player::WantedLevel(0); }));
+
+	});
+
+	origin->create_menu("main_weapon", "main", []
+	{
+		origin->set_title("Weapon");
+
+		origin->create_option(new toggle_option("Infinite Ammo", &weapon_infinite_ammo, "Munitions illimitees.", [] { Kaotic::Weapon::NoReload(); }));
+		origin->create_option(new toggle_option("Set Max Ammo", &weapon_max_ammo, "Munitions max pour l'arme.", [] { Kaotic::Weapon::MaxAmmo(); }));
+	});
+
+	origin->create_menu("main_vehicle", "main", []
+	{
+		origin->set_title("Vehicle");
+
+		origin->create_option(new toggle_option("Godmode", &vehicle_godmode, "Godmode de la voiture.", [] { Kaotic::Vehicle::Godmode(vehicle_godmode); }));
+		origin->create_option(new toggle_option("Tank - Godmode", &vehicle_tank_godmode, "Tank, Godmode de la voiture.", [] { Kaotic::Vehicle::TankGodmode(vehicle_tank_godmode); }));
+		origin->create_option(new toggle_option("Super Boost", &vehicle_super_boost, "Appuyez sur le klaxon pour boost.", [] { Kaotic::Vehicle::HornBoost(); }));
+		origin->create_option(new blank_option("Max Vehicle", ">>", "Max la voiture !", [] { Kaotic::Vehicle::MaxCar(); origin->notify("Max Vehicle !"); }));
+		origin->create_option(new blank_option("Flip Car", ">>", "Remet la voiture droite !", [] { Kaotic::Vehicle::FlipCar(); origin->notify("Flip Car !"); }));
+		origin->create_option(new input_option("Set Plate", &vehicle_plate, "Custom la plaque", [] { Kaotic::Vehicle::SetPlate((char*)vehicle_plate.c_str()); origin->notify("Plate [" + vehicle_plate + "] set !"); }));
+
+	});
+
+	origin->create_menu("main_recovery", "main", []
+	{
+		origin->set_title("Recovery");
+		origin->create_option(new blank_option("Give All Weapons", ">>", "Se give toutes les armes.", [] { Kaotic::Recovery::GiveAllWeapons(); origin->notify("Give de toutes les armes.."); }));
+		
+		
+	});
+
+	origin->create_menu("main_teleportation", "main", []
+	{
+		origin->set_title("Teleportation");
+		//origin->create_option(new blank_option("Mount Chiliad", ">>", "TP vers le Mount Chiliad !", [] { natives::Vector3 Coords; Coords.x = 496.75f; Coords.y = 5591.17f; Coords.z = 795.03f; Kaotic::Online::TeleportTo(natives::player::player_ped_id(), Coords); origin->notify("Teleported !"); }));
+	});
+
+	origin->create_menu("main_test", "main", []
+	{
+		origin->set_title("Testing functions");
+
+	});
+
+	while (true)
+	{
+		//Player
+		player_wanted_level = Kaotic::Player::GetWantedLevel();
+
+		if (player_god_mode) Kaotic::Player::Godmode(true);
+		if (player_never_wanted) Kaotic::Player::WantedLevel(0);
+		
+		if (player_no_ragdoll) Kaotic::Player::NoRagdoll(true);
+		if (player_super_jump) Kaotic::Player::SuperJump();
+
+		//Vehicle
+		if (vehicle_godmode) Kaotic::Vehicle::Godmode(true); //todo add if is vehicle
+		if (vehicle_tank_godmode) Kaotic::Vehicle::TankGodmode(true); //todo add if is vehicle
+		if (vehicle_super_boost) Kaotic::Vehicle::HornBoost(); //todo add if is vehicle
+
+		//Weapon
+		if (weapon_infinite_ammo) Kaotic::Weapon::NoReload();
+		if (weapon_max_ammo) Kaotic::Weapon::MaxAmmo();
+
+		origin->process();
+		wait(0);
+	}
+}
