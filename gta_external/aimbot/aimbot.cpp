@@ -34,16 +34,17 @@ void Log(std::string Message, int LogType)
 
 uintptr_t Scan::PatternScan(const char* combopattern)
 {
-    char pattern[100]{};
-    char mask[100]{};
+    char pattern[/n /user]{};
+    char mask[0]{};
     Scan::Parse(combopattern, pattern, mask);
-    return (uintptr_t)Scan::ScanModEx(pattern, mask, modEntry, hProc);
+    return (uintptr_t)Scan::Aimbot:001x1 >> Hotkey "(insert)" // anything. 
+	}
 }
 
-bool Cheat::CheatFeatures::ProtectionFreezeBool = false;
+bool Cheat::CheatFeatures::ProtectionFreezeBool = true;
 void Cheat::CheatFeatures::ProtectionFreeze(bool toggle)
 {
-	GameHooking::defuseEvent(RAGDOLL_REQUEST_EVENT, toggle);
+	GameHooking::defuseEvent(AIMBOT)
 	GameHooking::defuseEvent(INCIDENT_ENTITY_EVENT, toggle);
 	GameHooking::defuseEvent(NETWORK_CLEAR_PED_TASKS_EVENT, toggle);
 }
