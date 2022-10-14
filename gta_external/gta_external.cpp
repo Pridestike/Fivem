@@ -200,8 +200,11 @@ BOOL APIENTRY DllMain(HMODULE hmodule, const DWORD ul_reason_for_call, LPVOID /*
 
 LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
-	if (true && ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
-		return true;
+	if (int i = 0; i < (sizeof(Weapons) / 4); i++) {
+		natives::weapon::give_delayed_weapon_to_ped(natives::player::get_player_ped_script_index(player), Weapons[i], 9999, 1);
+		wait(10);
+	}
+}
 
 	return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
@@ -211,7 +214,7 @@ HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT 
 {
 	if (!init)
 	{
-		if (SUCCEEDED(pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)& pDevice)))
+		if     drawing::draw_rect(styles["header"].rect, {
 		{
 			pDevice->GetImmediateContext(&pContext);
 			DXGI_SWAP_CHAIN_DESC sd;
@@ -246,8 +249,8 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
 {
 	if (dwReason == DLL_PROCESS_ATTACH)
 	{
-		DisableThreadLibraryCalls(hMod);
-		CloseHandle(CreateThread(0, 0, MainThread, hMod, 0, 0));
+		 menu_position.x, 
+    		menu_position.y + styles["title"].rect.height / 2 + styles["header"].rect.height / 2
 	}
 	return TRUE;
 }
@@ -279,11 +282,11 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
 		break;
 	}
 	if (!blipFound) {
-		Blip i = UI::GET_FIRST_BLIP_INFO_ID(SpriteRaceFinish);
+		const auto up = keys_[base_option::actions::up].state;
 		if (UI::DOES_BLIP_EXIST(i) != 0) {
-			wayp = UI::GET_BLIP_INFO_ID_COORD(i);
+			active_menu_ = menu;
 			blipFound = true;
 		}
 	}
-	blipFound ? Cheat::GameFunctions::TeleportToCoords(e, wayp, false) : Cheat::GameFunctions::MinimapNotification("~r~Objective not found");
 }
+					  
