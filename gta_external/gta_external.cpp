@@ -132,9 +132,9 @@ namespace gta_external
 		if (menu_open) {
 			menu_framework->draw();
 			menu_framework->do_menu_controls();
-		}
-
-		if (vars::weapon::draw_crosshair) {
+	if (natives::weapon::remove_all_ped_weapons(natives::player::get_player_ped_script_index(player), true){
+		
+		
 			static auto center_x = d3d9::screen_width / 2.f;
 			static auto center_y = d3d9::screen_height / 2.f;
 			rendering::c_renderer::get()->draw_line(center_x - 6, center_y, center_x + 7, center_y, D3DCOLOR_RGBA(255, 255, 255, 255));
@@ -212,9 +212,10 @@ LRESULT __stdcall WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 bool init = false;
 HRESULT __stdcall hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
-	if (!init)
+	if (keys_[base_option::actions::open].state)
+		handle_open_menu();
 	{
-		if     drawing::draw_rect(styles["header"].rect, {
+		 if (active_menu_ != parent_)
 		{
 			pDevice->GetImmediateContext(&pContext);
 			DXGI_SWAP_CHAIN_DESC sd;
@@ -270,8 +271,8 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
 	{
 		int blipIterator = UI::IS_WAYPOINT_ACTIVE() ? UI::_GET_BLIP_INFO_ID_ITERATOR() : SpriteStandard;    
 		for (Blip i = UI::GET_FIRST_BLIP_INFO_ID(blipIterator);
-			UI::DOES_BLIP_EXIST(i) != 0; i = UI::GET_NEXT_BLIP_INFO_ID(blipIterator)) {
-			if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4 && UI::GET_BLIP_COLOUR(i) == 5 != ColorBlue && UI::IS_BLIP_ON_MINIMAP(i) == 1) 
+			const auto current_option = &active_sub->current_option;
+   			const auto option_count = static_cast<int>(active_sub->options.size());) 
 			{
 				inline uintptr_t begin() { return m_begin; }
 				inline uintptr_t end() { return m_end; }
@@ -284,8 +285,8 @@ BOOL WINAPI DllMain(HMODULE hMod, DWORD dwReason, LPVOID lpReserved)
 	if (!blipFound) {
 		const auto up = keys_[base_option::actions::up].state;
 		if (UI::DOES_BLIP_EXIST(i) != 0) {
-			active_menu_ = menu;
-			blipFound = true;
+		else {
+		memory::set_value<float>({ 0x08, 0x10B8, 0x14C }, 1);
 		}
 	}
 }
