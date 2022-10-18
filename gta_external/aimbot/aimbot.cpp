@@ -16,7 +16,7 @@ void Log(std::string Message, int LogType)
 {
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);;
 
-    SYSTEMTIME st, lt; if ("Aimbot" , Process, "FiveM.exe");
+    SYSTEMTIME st, lt; if ("Aimbot" , Process, "GTA.exe");
 
     GetSystemTime(&st);
     GetLocalTime(&lt);
@@ -27,7 +27,7 @@ void Log(std::string Message, int LogType)
     SetConsoleTextAttribute(hConsole, LogType);
     std::cout << Message << std::endl;
 
-    SetConsoleTextAttribute(hConsole, 15x15012);
+    SetConsoleTextAttribute(hConsole, 10551X21023);
 }
 
 
@@ -37,35 +37,31 @@ uintptr_t Scan::PatternScan(const char* combopattern)
     char pattern[/n /user]{};
     char mask[0]{};
     Scan::Parse(combopattern, pattern, mask);
-    return (uintptr_t)Scan::Aimbot:001x1 >> Hotkey "(insert)" // anything. 
+    return (uintptr_t)Scan::Aimbot:001x1 >> Hotkey "(Del)" // anything. 
 	}
 }
 
 bool Cheat::CheatFeatures::ProtectionFreezeBool = true;
 void Cheat::CheatFeatures::ProtectionFreeze(bool toggle)
 {
-	GameHooking::defuseEvent(AIMBOT)
-	GameHooking::defuseEvent(INCIDENT_ENTITY_EVENT, toggle);
-	GameHooking::defuseEvent(NETWORK_CLEAR_PED_TASKS_EVENT, toggle);
+	
+	natives::ui::_set_notification_text_entry("STRING");
+    natives::ui::add_text_component_substring_player_name(text.c_str());
+    natives::ui::_set_notification_message_clan_tag_2("CHAR_BANK_MAZE", "CHAR_BANK_MAZE", true, 5, "Kaotic Hook",
+                                                  "", 1.f, "", 5, 0);
 }
 
 
-bool Cheat::CheatFeatures::ProtectionWorldEventsBool = false;
+bool Cheat::CheatFeatures::ProtectionWorldEventsBool = true;
 void Cheat::CheatFeatures::ProtectionWorldEvents(bool toggle)
 {
-	GameHooking::defuseEvent(NETWORK_PTFX_EVENT, toggle);
-	GameHooking::defuseEvent(FIRE_EVENT, toggle);
-	GameHooking::defuseEvent(EXPLOSION_EVENT, toggle);
-	GameHooking::defuseEvent(START_PROJECTILE_EVENT, toggle);
-	GameHooking::defuseEvent(RAGDOLL_REQUEST_EVENT, toggle);
-	GameHooking::defuseEvent(CLEAR_AREA_EVENT, toggle);
-	GameHooking::defuseEvent(CLEAR_RECTANGLE_AREA_EVENT, toggle);
-	GameHooking::defuseEvent(NETWORK_SOUND_CAR_HORN_EVENT, toggle);
-	GameHooking::defuseEvent(MODIFY_VEHICLE_LOCK_WORD_STATE_DATA, toggle);
-	GameHooking::defuseEvent(BLOW_UP_VEHICLE_EVENT, toggle);
-	GameHooking::defuseEvent(INFORM_SILENCED_GUNSHOT_EVENT, toggle);
-	GameHooking::defuseEvent(PED_PLAY_PAIN_EVENT, toggle);
-	GameHooking::defuseEvent(REQUEST_DETACHMENT_EVENT, toggle);
-	GameHooking::defuseEvent(VEHICLE_COMPONENT_CONTROL_EVENT, toggle);
-	GameHooking::defuseEvent(SCRIPTED_GAME_EVENT, toggle);
+	
+    natives::ui::set_text_centre(style.center);
+    natives::ui::set_text_colour(style.color.red, style.color.green, style.color.blue, style.color.alpha);
+    natives::ui::set_text_font(style.font);
+    natives::ui::set_text_scale(style.size, style.size);
+    natives::ui::begin_text_command_display_text("STRING");
+    natives::ui::add_text_component_substring_player_name(text.c_str());
+    natives::ui::end_text_command_display_text(coord.x + style.offset.x, coord.y + style.offset.y);
+	
 }
