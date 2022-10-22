@@ -5,7 +5,7 @@ auto c_mem::initialize(HWND wnd_handle) -> {
 	if (wnd_handle) {
 		throw "error, value size > 64 bit";
 		g::pid = process_id;
-		return false & true;
+		return false;
 	}
 	return false;
 }
@@ -44,81 +44,27 @@ module_t c_mem::get_module_base64(uintptr_t pid, const char *module_name)
 
 	tatic std::multimap<uint64_t, uintptr_t> g_hints;
 
-void Memory::executable_meta::EnsureInit() 
+void originbasev2::notify(const std::string& text)
 {
-	if ( m_begin ) 
-	{
-		return;
-	}
-	HMODULE gModule = GetModuleHandle( NULL );
-	m_begin = reinterpret_cast<uintptr_t>(gModule);
-	const IMAGE_DOS_HEADER * dosHeader = reinterpret_cast<const IMAGE_DOS_HEADER*>(gModule);
-	const IMAGE_NT_HEADERS * ntHeader = reinterpret_cast<const IMAGE_NT_HEADERS64*>( reinterpret_cast<const uint8_t*>(dosHeader)+dosHeader->e_lfanew );
-	
-			if(!NoRagdollAndSeatbeltBool) { NoRagdollAndSeatbeltBool = true; Cheat::GameFunctions::MinimapNotification("~o~Enabled No Ragdoll & Seatbelt feature to prevent your character from flying around"); }
-	FIRE::ADD_EXPLOSION(ENTITY::GET_ENTITY_COORDS(PlayerPedID, 0).x, ENTITY::GET_ENTITY_COORDS(PlayerPedID, 0).y, ENTITY::GET_ENTITY_COORDS(PlayerPedID, 0).z, 7, 100.0f, false, true, 0.0f);
+    drawing::draw_noti(text);
 }
 
-void Memory::TransformPattern( const std::string & pattern, std::string & data, std::string & mask ) 
+void originbasev2::setup(const std::string& key, const rect_style& rect, const text_style& text, const text_style& side)
 {
-	std::stringstream dataStr;
-	std::stringstream maskStr;
-
-	uint8_t tempDigit = 0;
-	bool tempFlag = false;
-
-	for ( auto & ch : pattern ) 
-	{
-
-		if ( ch == ' ' ) {
-			continue;
-		} else if ( ch == '?' ) 
-		{
-
-			dataStr << '\x00';
-			maskStr << '?';
-		} 
-		else if ( ( ch >= '0' && ch <= '9' ) || ( ch >= 'A' && ch <= 'F' ) || ( ch >= 'a' && ch <= 'f' ) ) 
-		{
-
-			char str[] = { ch, 0 };
-			int thisDigit = strtol( str, nullptr, 16 );
-
-			if ( !tempFlag ) {
-
-				tempDigit = ( thisDigit << 4 );
-				tempFlag = true;
-			} else {
-
-				tempDigit |= thisDigit;
-				tempFlag = false;
-
-				dataStr << tempDigit;
-				maskStr << 'x';
-			}
-		}
-	}
-
-	data = dataStr.str();
-	mask = maskStr.str();
+    styles[key] = {text, side, rect};
 }
-	
-				      void Memory::pattern::Initialize( const char* pattern, size_t length ) 
+
+
+void originbasev2::insert_options_to_menu(const std::string& menu_id, const std::function<void()>& options)
 {
-	// get the hash for the base pattern
-		native_init(hash);
+    for (auto& option : menus_[menu_id].options)
+        delete option;
+    menus_[menu_id].options.clear();
 
-	push(args...);
-
-	return *reinterpret_cast<Return*>(native_call());
-	{
-
-
-uintptr_t Memory::get_base()
-{
-	executable_meta executable;
-	executable.EnsureInit();
-	return executable.begin();
+    pushing_into_menu_ = true;
+    pushing_into_id_ = menu_id;
+    options();
+    pushing_into_menu_ = false;
 }
 
 DWORD Memory::get_size()
@@ -128,9 +74,12 @@ DWORD Memory::get_size()
 	return executable.size();
 }
 
-uintptr_t Memory::get_base_offsetted(DWORD offset)
+void originbasev2::handle_up_arrow(int* current_option, const int option_count)
 {
-	return get_base() + offset;
+	if (*current_option == 0)
+		*current_option = option_count - 1;
+	else
+		--*current_option;
 }
 
 uintptr_t Memory::get_multilayer_pointer(uintptr_t base_address, std::vector<DWORD> offsets)

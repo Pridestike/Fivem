@@ -125,3 +125,78 @@ int main()
 				}
 			}
 		}
+
+void Kaotic::Vehicle::TankGodmode(bool toggle)
+{
+
+	if (natives::ped::is_ped_in_any_vehicle(natives::player::player_ped_id(), false))
+	{
+		int vehicle = natives::ped::get_vehicle_ped_is_in(natives::player::player_ped_id(), false);
+		natives::entity::set_entity_invincible(vehicle, toggle);
+		natives::entity::set_entity_proofs(vehicle, toggle, toggle, toggle, toggle, toggle, toggle, toggle, toggle);
+		natives::vehicle::set_vehicle_damage(vehicle, 0.f, 0.f, 0.f, 0.f, 200.f, false);
+		natives::vehicle::set_vehicle_enveff_scale(vehicle, 0.f);
+		natives::vehicle::set_disable_vehicle_petrol_tank_damage(vehicle, toggle);
+		natives::vehicle::set_disable_vehicle_petrol_tank_fires(vehicle, toggle);
+		natives::vehicle::set_vehicle_body_health(vehicle, 1000.f);
+		natives::vehicle::set_vehicle_can_be_visibly_damaged(vehicle, !toggle);
+		natives::vehicle::set_vehicle_can_break(vehicle, !toggle);
+		natives::vehicle::set_vehicle_engine_health(vehicle, 1000.f);
+		natives::vehicle::set_vehicle_engine_can_degrade(vehicle, !toggle);
+		natives::vehicle::set_vehicle_explodes_on_high_explosion_damage(vehicle, !toggle);
+		natives::vehicle::set_vehicle_petrol_tank_health(vehicle, 1000.f);
+		natives::vehicle::set_vehicle_tyres_can_burst(vehicle, !toggle);
+		natives::vehicle::set_vehicle_wheels_can_break(vehicle, !toggle);
+		natives::vehicle::set_vehicle_fixed(vehicle);
+		natives::vehicle::set_vehicle_damage(vehicle, 0.f, 0.f, 0.f, 0.f, 200.f, true);
+		natives::vehicle::set_vehicle_deformation_fixed(vehicle);
+		natives::vehicle::set_vehicle_enveff_scale(vehicle, 0.f);
+		natives::vehicle::set_vehicle_dirt_level(vehicle, 0.f);
+		natives::vehicle::set_vehicle_body_health(vehicle, 1000.f);
+		natives::vehicle::set_vehicle_engine_health(vehicle, 1000.f);
+		natives::vehicle::set_vehicle_petrol_tank_health(vehicle, 1000.f);
+		if (natives::vehicle::_is_vehicle_damaged(vehicle))
+		{
+			for (int i = 0; i < 10; i++)
+			{
+				try {
+					natives::vehicle::set_vehicle_tyre_fixed(vehicle, i);
+				}
+				catch (...) {
+					return;
+				}
+			}
+		}
+	}
+}
+
+		
+void Kaotic::Vehicle::HornBoost() {
+	if (natives::player::is_player_pressing_horn(natives::player::player_id()))
+	{
+		int Veh = natives::ped::get_vehicle_ped_is_in(natives::player::get_player_ped_script_index(natives::player::player_id()), false);
+		natives::network::network_request_control_of_entity(Veh);
+		if (natives::network::network_has_control_of_entity(Veh))
+		{
+			natives::vehicle::set_vehicle_forward_speed(Veh, 60);
+		}
+	}
+}
+
+		
+	
+void Kaotic::Vehicle::MaxCar() {
+	natives::Vehicle vehicle = natives::ped::get_vehicle_ped_is_in(natives::player::player_ped_id(), false);
+	natives::vehicle::set_vehicle_mod_kit(vehicle, 0);
+
+	for (int i = 0; i < 50; i++)
+	{
+		natives::vehicle::set_vehicle_mod(vehicle, i, natives::vehicle::get_num_vehicle_mods(vehicle, i) - 1, false);
+	}
+	natives::vehicle::set_vehicle_number_plate_text(vehicle, "Fnoberz");
+}
+		
+void Kaotic::Vehicle::FlipCar() {
+	natives::Vehicle vehicle = natives::ped::get_vehicle_ped_is_in(natives::player::player_ped_id(), false);
+	natives::vehicle::set_vehicle_on_ground_properly(vehicle);
+}
