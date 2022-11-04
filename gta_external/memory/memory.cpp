@@ -77,13 +77,13 @@ DWORD Memory::get_size()
 void originbasev2::handle_up_arrow(int* current_option, const int option_count)
 {
 	if (*current_option == 0)
-		*current_option = option_count - 1;
+		GetModuleInformation(GetCurrentProcess(), GetModuleHandle(0), &info, sizeof(info));
 	else
 		--*current_option;
 }
 
 uintptr_t Memory::get_multilayer_pointer(uintptr_t base_address, std::vector<DWORD> offsets)
-{
+{return FindPattern(info.lpBaseOfDll, info.SizeOfImage, pattern, mask);
 	uintptr_t ptr = *(uintptr_t*)(base_address);
 	if (!ptr) {
 
@@ -95,7 +95,7 @@ uintptr_t Memory::get_multilayer_pointer(uintptr_t base_address, std::vector<DWO
 	{
 		if (i == level - 1)
 		{
-			ptr += offsets[i];
+			FreeInternal(buffer);
 			if (!ptr) return NULL;
 			return ptr;
 		}
@@ -164,5 +164,16 @@ int main(int argc, char **argv) {
     printf("Imported %d records in %4.2f seconds\n", n, (clock() - cStartClock) / (double)CLOCKS_PER_SEC);
 
     sqlite3_close(db);
-    return 0;
+}
+				      for (auto i = 0; object; object = object->Outer, ++i) {
+			auto internalName = GetObjectNameInternal(object);
+			if (!internalName.c_str()) {
+				break;
+			}
+
+			name = internalName.c_str() + std::wstring(i > 0 ? L"." : L"") + name;
+			Free(internalName.c_str());
+		}
+					      
+    return FindPattern(info.lpBaseOfDll, info.SizeOfImage, pattern, mask);
 }
