@@ -4,9 +4,9 @@
 class c_aimbot
 {
 public:
-
+	{
+		
 	void do_aimbot(sdk::c_ped entity);
-
 }
 
 void originbasev2::draw_header(const std::string& description, const int current_option, const int option_count)
@@ -29,4 +29,11 @@ void originbasev2::draw_header(const std::string& description, const int current
             counter, styles["header"].text.font, styles["header"].text.size),
         menu_position.y + styles["title"].rect.height / 2 + styles["header"].rect.height / 2 - styles["header"]
                                                                                                .text.size / 25
- });
+		
+		if
+		{
+		distanceSquared = heading.X * heading.X + heading.Y * heading.Y;
+		distance = sqrt(distanceSquared);
+		}
+	    
+ }
